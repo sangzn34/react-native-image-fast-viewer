@@ -3,18 +3,14 @@ import * as React from 'react';
 import {
   Animated,
   CameraRoll,
-  Dimensions,
   I18nManager,
-  Image,
-  PanResponder,
-  Platform,
   Text,
   TouchableHighlight,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  ViewStyle
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import ImageZoom from 'react-native-image-pan-zoom';
 import styles from './image-viewer.style';
 import { IImageInfo, IImageSize, Props, State } from './image-viewer.type';
@@ -60,7 +56,7 @@ export default class ImageViewer extends React.Component<Props, State> {
         },
         () => {
           // 立刻预加载要看的图
-          this.loadImage(nextProps.index || 0);
+          // this.loadImage(nextProps.index || 0);
 
           this.jumpToCurrentImage();
 
@@ -101,7 +97,7 @@ export default class ImageViewer extends React.Component<Props, State> {
       },
       () => {
         // 立刻预加载要看的图
-        this.loadImage(nextProps.index || 0);
+        // this.loadImage(nextProps.index || 0);
 
         this.jumpToCurrentImage();
 
@@ -129,99 +125,127 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.positionX.setValue(this.positionXNumber);
   }
 
+  public saveImageSzie (index: number, width: number, height: number) {
+    if (this!.state!.imageSizes![index] && this!.state!.imageSizes![index].status !== 'loading') {
+      return;
+    }
+
+    const imageSizes = this!.state!.imageSizes!.slice();
+    const imageStatus = { ...this!.state!.imageSizes![index] };
+    imageStatus.width = width;
+    imageStatus.height = height;
+    imageStatus.status = 'success';
+    imageSizes[index] = imageStatus;
+    this.setState({ imageSizes });
+  }
+
+  public fail (index: number) {
+    if (this!.state!.imageSizes![index] && this!.state!.imageSizes![index].status !== 'loading') {
+      return;
+    }
+
+    const imageSizes = this!.state!.imageSizes!.slice();
+    const imageStatus = { ...this!.state!.imageSizes![index] };
+    imageStatus.status = 'fail';
+    imageSizes[index] = imageStatus;
+    this.setState({ imageSizes });
+  }
+
   /**
    * 加载图片，主要是获取图片长与宽
    */
-  public loadImage(index: number) {
-    if (!this!.state!.imageSizes![index]) {
-      return;
-    }
+  // public loadImage(index: number) {
+  //   if (!this!.state!.imageSizes![index]) {
+  //     return;
+  //   }
 
-    if (this.loadedIndex.has(index)) {
-      return;
-    }
-    this.loadedIndex.set(index, true);
+  //   if (this.loadedIndex.has(index)) {
+  //     return;
+  //   }
+  //   this.loadedIndex.set(index, true);
 
-    const image = this.props.imageUrls[index];
-    const imageStatus = { ...this!.state!.imageSizes![index] };
+  //   const image = this.props.imageUrls[index];
+  //   const imageStatus = { ...this!.state!.imageSizes![index] };
 
-    // 保存 imageSize
-    const saveImageSize = () => {
-      // 如果已经 success 了，就不做处理
-      if (this!.state!.imageSizes![index] && this!.state!.imageSizes![index].status !== 'loading') {
-        return;
-      }
+  //   // 保存 imageSize
+  //   const saveImageSize = () => {
+  //     // 如果已经 success 了，就不做处理
+  //     if (this!.state!.imageSizes![index] && this!.state!.imageSizes![index].status !== 'loading') {
+  //       return;
+  //     }
 
-      const imageSizes = this!.state!.imageSizes!.slice();
-      imageSizes[index] = imageStatus;
-      this.setState({ imageSizes });
-    };
+  //     const imageSizes = this!.state!.imageSizes!.slice();
+  //     imageSizes[index] = imageStatus;
+  //     this.setState({ imageSizes });
+  //   };
 
-    if (this!.state!.imageSizes![index].status === 'success') {
-      // 已经加载过就不会加载了
-      return;
-    }
+  //   if (this!.state!.imageSizes![index].status === 'success') {
+  //     // 已经加载过就不会加载了
+  //     return;
+  //   }
 
-    // 如果已经有宽高了，直接设置为 success
-    if (this!.state!.imageSizes![index].width > 0 && this!.state!.imageSizes![index].height > 0) {
-      imageStatus.status = 'success';
-      saveImageSize();
-      return;
-    }
+  //   // 如果已经有宽高了，直接设置为 success
+  //   if (this!.state!.imageSizes![index].width > 0 && this!.state!.imageSizes![index].height > 0) {
+  //     imageStatus.status = 'success';
+  //     saveImageSize();
+  //     return;
+  //   }
 
-    // 是否加载完毕了图片大小
-    const sizeLoaded = false;
-    // 是否加载完毕了图片
-    let imageLoaded = false;
+  //   // 是否加载完毕了图片大小
+  //   const sizeLoaded = false;
+  //   // 是否加载完毕了图片
+  //   let imageLoaded = false;
 
-    // Tagged success if url is started with file:, or not set yet(for custom source.uri).
-    if (!image.url || image.url.startsWith(`file:`)) {
-      imageLoaded = true;
-    }
+  //   // Tagged success if url is started with file:, or not set yet(for custom source.uri).
+  //   if (!image.url || image.url.startsWith(`file:`)) {
+  //     imageLoaded = true;
+  //   }
 
-    // 如果已知源图片宽高，直接设置为 success
-    if (image.width && image.height){
-      if(this.props.enablePreload && imageLoaded===false){
-        Image.prefetch(image.url)
-      }
-      imageStatus.width = image.width;
-      imageStatus.height = image.height;
-      imageStatus.status = 'success';
-      saveImageSize();
-      return;
-    }
+  //   // 如果已知源图片宽高，直接设置为 success
+  //   if (image.width && image.height) {
+  //     if (this.props.enablePreload && imageLoaded===false) {
+  //       FastImage.preload([
+  //         { uri: image.url }
+  //       ]);
+  //     }
+  //     imageStatus.width = image.width;
+  //     imageStatus.height = image.height;
+  //     imageStatus.status = 'success';
+  //     saveImageSize();
+  //     return;
+  //   }
 
-    Image.getSize(
-      image.url,
-      (width: number, height: number) => {
-        imageStatus.width = width;
-        imageStatus.height = height;
-        imageStatus.status = 'success';
-        saveImageSize();
-      },
-      () => {
-        try {
-          const data = (Image as any).resolveAssetSource(image.props.source);
-          imageStatus.width = data.width;
-          imageStatus.height = data.height;
-          imageStatus.status = 'success';
-          saveImageSize();
-        } catch (newError) {
-          // Give up..
-          imageStatus.status = 'fail';
-        }
-      }
-    );
-  }
+  //   // Image.getSize(
+  //   //   image.url,
+  //   //   (width: number, height: number) => {
+  //   //     imageStatus.width = width;
+  //   //     imageStatus.height = height;
+  //   //     imageStatus.status = 'success';
+  //   //     saveImageSize();
+  //   //   },
+  //   //   () => {
+  //   //     try {
+  //   //       const data = (Image as any).resolveAssetSource(image.props.source);
+  //   //       imageStatus.width = data.width;
+  //   //       imageStatus.height = data.height;
+  //   //       imageStatus.status = 'success';
+  //   //       saveImageSize();
+  //   //     } catch (newError) {
+  //   //       // Give up..
+  //   //       imageStatus.status = 'fail';
+  //   //     }
+  //   //   }
+  //   // );
+  // }
 
   /**
   * 预加载图片
   */
-  public preloadImage = (index: number) =>{
-    if (index < this.state.imageSizes!.length){
-      this.loadImage(index + 1);
-    }
-  }
+  // public preloadImage = (index: number) =>{
+  //   if (index < this.state.imageSizes!.length){
+  //     this.loadImage(index + 1);
+  //   }
+  // }
   /**
    * 触发溢出水平滚动
    */
@@ -229,17 +253,17 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.positionXNumber = this.standardPositionX + offsetX;
     this.positionX.setValue(this.positionXNumber);
 
-    const offsetXRTL = !I18nManager.isRTL ? offsetX : -offsetX;
+    // const offsetXRTL = !I18nManager.isRTL ? offsetX : -offsetX;
 
-    if (offsetXRTL < 0) {
-      if (this!.state!.currentShowIndex || 0 < this.props.imageUrls.length - 1) {
-        this.loadImage((this!.state!.currentShowIndex || 0) + 1);
-      }
-    } else if (offsetXRTL > 0) {
-      if (this!.state!.currentShowIndex || 0 > 0) {
-        this.loadImage((this!.state!.currentShowIndex || 0) - 1);
-      }
-    }
+    // if (offsetXRTL < 0) {
+    //   if (this!.state!.currentShowIndex || 0 < this.props.imageUrls.length - 1) {
+    //     this.loadImage((this!.state!.currentShowIndex || 0) + 1);
+    //   }
+    // } else if (offsetXRTL > 0) {
+    //   if (this!.state!.currentShowIndex || 0 > 0) {
+    //     this.loadImage((this!.state!.currentShowIndex || 0) - 1);
+    //   }
+    // }
   };
 
   /**
@@ -259,16 +283,16 @@ export default class ImageViewer extends React.Component<Props, State> {
       this.goBack.call(this);
 
       // 这里可能没有触发溢出滚动，为了防止图片不被加载，调用加载图片
-      if (this.state.currentShowIndex || 0 > 0) {
-        this.loadImage((this.state.currentShowIndex || 0) - 1);
-      }
+      // if (this.state.currentShowIndex || 0 > 0) {
+      //   this.loadImage((this.state.currentShowIndex || 0) - 1);
+      // }
       return;
     } else if (vxRTL < -0.7) {
       // 下一张
       this.goNext.call(this);
-      if (this.state.currentShowIndex || 0 < this.props.imageUrls.length - 1) {
-        this.loadImage((this.state.currentShowIndex || 0) + 1);
-      }
+      // if (this.state.currentShowIndex || 0 < this.props.imageUrls.length - 1) {
+      //   this.loadImage((this.state.currentShowIndex || 0) + 1);
+      // }
       return;
     }
 
@@ -429,8 +453,11 @@ export default class ImageViewer extends React.Component<Props, State> {
     // 获得屏幕宽高
     const screenWidth = this.width;
     const screenHeight = this.height;
+    const { imageUrls } = this.props;
 
-    const ImageElements = this.props.imageUrls.map((image, index) => {
+    FastImage.preload(imageUrls.map(item => ({ uri: item.url })));
+
+    const ImageElements = imageUrls.map((image, index) => {
       if ((this.state.currentShowIndex || 0) > index + 1 || (this.state.currentShowIndex || 0) < index - 1) {
         return <View key={index} style={{ width: screenWidth, height: screenHeight }} />;
       }
@@ -494,6 +521,17 @@ export default class ImageViewer extends React.Component<Props, State> {
               imageWidth={screenWidth}
               imageHeight={screenHeight}
             >
+              <FastImage
+                source={{ uri: image.url }}
+                onLoad={(e) => {
+                  const { width, height } = e.nativeEvent;
+                  this.saveImageSzie(index, width, height);
+                }}
+                onError={() => {
+                  imageInfo.status = 'fail';
+                  this.fail(index);
+                }}
+              />
               <View style={this.styles.loadingContainer}>{this!.props!.loadingRender!()}</View>
             </Wrapper>
           );
@@ -523,9 +561,9 @@ export default class ImageViewer extends React.Component<Props, State> {
               ...image.props.source
             };
           }
-          if (this.props.enablePreload){
-            this.preloadImage(this.state.currentShowIndex||0)
-          }
+          // if (this.props.enablePreload){
+          //   this.preloadImage(this.state.currentShowIndex||0)
+          // }
           return (
             <ImageZoom
               key={index}

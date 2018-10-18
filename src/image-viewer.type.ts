@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Image, ImageURISource, Text, View, ViewStyle } from 'react-native';
+import { Text, View, ViewStyle } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { simpleStyle } from './image-viewer.style';
 
 export class Props {
@@ -139,7 +140,7 @@ export class Props {
    * Render image component
    */
   public renderImage?: (props: any) => React.ReactElement<any> = (props: any) => {
-    return React.createElement(Image, props);
+    return React.createElement(FastImage, props);
   };
 
   /**
