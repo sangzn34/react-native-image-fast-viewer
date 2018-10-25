@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Text, View, ViewStyle } from 'react-native';
+import { Image, Text, View, ViewStyle } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { simpleStyle } from './image-viewer.style';
+import { simpleStyle, ImageViewerStyles } from './image-viewer.style';
 
 export class Props {
   /**
@@ -60,6 +60,8 @@ export class Props {
   public enableImageZoom?: boolean = true;
 
   public style?: ViewStyle = {};
+
+  public mixinStyles?: ImageViewerStyles = {};
 
   /**
    * Enable swipe down to close image viewer.

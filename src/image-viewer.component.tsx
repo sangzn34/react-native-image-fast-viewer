@@ -32,7 +32,7 @@ export default class ImageViewer extends React.Component<Props, State> {
   private width = 0;
   private height = 0;
 
-  private styles = styles(0, 0, 'transparent');
+  private styles = styles(0, 0, 'transparent', this.props.mixinStyles || {});
 
   // 是否执行过 layout. fix 安卓不断触发 onLayout 的 bug
   private hasLayout = false;
@@ -438,7 +438,7 @@ export default class ImageViewer extends React.Component<Props, State> {
 
       this.width = event.nativeEvent.layout.width;
       this.height = event.nativeEvent.layout.height;
-      this.styles = styles(this.width, this.height, this.props.backgroundColor || 'transparent');
+      this.styles = styles(this.width, this.height, this.props.backgroundColor || 'transparent', this.props.mixinStyles || {});
 
       // 强制刷新
       this.forceUpdate();

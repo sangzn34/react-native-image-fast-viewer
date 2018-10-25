@@ -1,6 +1,6 @@
 {
-  "name": "react-native-image-zoom-viewer",
-  "version": "2.2.22",
+  "name": "react-native-fast-image-zoom-viewer",
+  "version": "2.3.0",
   "description": "react native image viewer,大图浏览",
   "main": "built/index.js",
   "types": "built/index.d.ts",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ascoders/react-native-image-viewer.git"
+    "url": "https://github.com/teabyii/react-native-image-viewer"
   },
   "keywords": [
     "image-viewer"
