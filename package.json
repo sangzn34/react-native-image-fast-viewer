@@ -1,6 +1,6 @@
 {
   "name": "react-native-image-fast-viewer",
-  "version": "2.3.0",
+  "version": "2.3.2",
   "description": "react native image viewer,大图浏览",
   "main": "built/index.js",
   "types": "built/index.d.ts",
