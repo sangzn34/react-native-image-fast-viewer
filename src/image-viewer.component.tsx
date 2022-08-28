@@ -8,9 +8,9 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
+  View
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import FastImage, { OnLoadEvent } from 'react-native-fast-image';
 import ImageZoom from 'react-native-image-pan-zoom';
 import styles from './image-viewer.style';
 import { IImageInfo, IImageSize, Props, State } from './image-viewer.type';
@@ -82,7 +82,7 @@ export default class ImageViewer extends React.Component<Props, State> {
 
     // 给 imageSizes 塞入空数组
     const imageSizes: IImageSize[] = [];
-    nextProps.imageUrls.forEach(imageUrl => {
+    nextProps.imageUrls.forEach((imageUrl) => {
       imageSizes.push({
         width: imageUrl.width || 0,
         height: imageUrl.height || 0,
@@ -125,7 +125,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.positionX.setValue(this.positionXNumber);
   }
 
-  public saveImageSzie (index: number, width: number, height: number) {
+  public saveImageSzie(index: number, width: number, height: number) {
     if (this!.state!.imageSizes![index] && this!.state!.imageSizes![index].status !== 'loading') {
       return;
     }
@@ -139,7 +139,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     this.setState({ imageSizes });
   }
 
-  public fail (index: number) {
+  public fail(index: number) {
     if (this!.state!.imageSizes![index] && this!.state!.imageSizes![index].status !== 'loading') {
       return;
     }
@@ -239,8 +239,8 @@ export default class ImageViewer extends React.Component<Props, State> {
   // }
 
   /**
-  * 预加载图片
-  */
+   * 预加载图片
+   */
   // public preloadImage = (index: number) =>{
   //   if (index < this.state.imageSizes!.length){
   //     this.loadImage(index + 1);
@@ -438,7 +438,12 @@ export default class ImageViewer extends React.Component<Props, State> {
 
       this.width = event.nativeEvent.layout.width;
       this.height = event.nativeEvent.layout.height;
-      this.styles = styles(this.width, this.height, this.props.backgroundColor || 'transparent', this.props.mixinStyles || {});
+      this.styles = styles(
+        this.width,
+        this.height,
+        this.props.backgroundColor || 'transparent',
+        this.props.mixinStyles || {}
+      );
 
       // 强制刷新
       this.forceUpdate();
@@ -455,7 +460,7 @@ export default class ImageViewer extends React.Component<Props, State> {
     const screenHeight = this.height;
     const { imageUrls } = this.props;
 
-    FastImage.preload(imageUrls.map(item => ({ uri: item.url })));
+    FastImage.preload(imageUrls.map((item) => ({ uri: item.url })));
 
     const ImageElements = imageUrls.map((image, index) => {
       if ((this.state.currentShowIndex || 0) > index + 1 || (this.state.currentShowIndex || 0) < index - 1) {
@@ -523,7 +528,7 @@ export default class ImageViewer extends React.Component<Props, State> {
             >
               <FastImage
                 source={{ uri: image.url }}
-                onLoad={(e) => {
+                onLoad={(e: OnLoadEvent) => {
                   const { width, height } = e.nativeEvent;
                   this.saveImageSzie(index, width, height);
                 }}
@@ -567,7 +572,7 @@ export default class ImageViewer extends React.Component<Props, State> {
           return (
             <ImageZoom
               key={index}
-              ref={el => (this.imageRefs[index] = el)}
+              ref={(el) => (this.imageRefs[index] = el)}
               cropWidth={this.width}
               cropHeight={this.height}
               maxOverflow={this.props.maxOverflow}
